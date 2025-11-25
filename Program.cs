@@ -6,11 +6,33 @@ using System.Text;
 public class Solution
     
 {
-    
     static void Main()
     {
-        
+       
     }
+    //258 
+    //задача уровня изи так что нечего говорить по сути просто сложить все со всем самое сложное просто правильно спарсить char в инт (нужно переводить в строку отдельный char иначе будет считать char по таблице)
+    public static int Anything(int num)
+    {
+        string srtring = num.ToString();
+        if (srtring.Length == 1)
+        {
+            return num;
+        }
+        int sumanything = 0;
+        while (srtring.Length > 1)
+        {
+            sumanything = 0;
+            foreach (char number in srtring)
+            {
+                int bukva = Int32.Parse(number.ToString());
+                sumanything += bukva;
+            }
+            srtring = sumanything.ToString();
+        }
+        return sumanything;
+    }
+
     public static int Fuction1(int input)
     {
         var ab = input.ToString().Select(n => n - '0').Order().ToList();
