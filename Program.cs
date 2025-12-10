@@ -1,15 +1,224 @@
-﻿using System;
-using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
+﻿using System.Text;
 
-public class Solution
-    
+namespace Algoritms;
+
+public class Algoritms
 {
     static void Main()
     {
-       
+      
     }
+    //Тут долгая история. По факту начинал я решать задачу 4 с лит кода где надо было просто соединить два отсортированных массива и просто вывести медиану, но я почему-то подумал что надо еще и удалить все дубликаты в массивах, то есть чтобы общий массив состоял только из уникальных элементов.
+    //И тут пошли мои попытки решать это в лоб как я люблю в итоге я попробовал самые ужасные способы решить в лоб, но я понял что иду не туда и решил посмотреть на подход с другой стороны (плюс немного интернета и раздумий) и получил вот это решение.
+    //На будущее для себя. Если нужно собрать что-то уникальное из сортированных источников: Сравнивай текущие -> Выбирай меньшее -> Смотри на ПОСЛЕДНЕЕ добавленное в результат. Если совпадает — выкидывай, если нет — добавляй, то есть сначала идет сравнение, а только потом уже проверка на дубликаты
+    public List<int> MergeAndDeduplicate(int[] nums1, int[] nums2) {
+        List<int> merged = new List<int>();
+        int i = 0, j = 0;
+        
+        while (i < nums1.Length && j < nums2.Length) {
+            int valToAdd;
+            
+            if (nums1[i] < nums2[j]) {
+                valToAdd = nums1[i];
+                i++;
+            } else if (nums2[j] < nums1[i]) {
+                valToAdd = nums2[j];
+                j++;
+            } else {
+                valToAdd = nums1[i];
+                i++;
+                j++;
+            }
+    
+            // ЭФФЕКТИВНАЯ ПРОВЕРКА НА ДУБЛИКАТЫ
+            if (merged.Count == 0 || merged[merged.Count - 1] != valToAdd) {
+                merged.Add(valToAdd);
+            }
+        }
+        
+        while (i < nums1.Length) {
+            int val = nums1[i];
+            if (merged.Count == 0 || merged[merged.Count - 1] != val) {
+                merged.Add(val);
+            }
+            i++;
+        }
+        
+        while (j < nums2.Length) {
+            int val = nums2[j];
+            if (merged.Count == 0 || merged[merged.Count - 1] != val) {
+                merged.Add(val);
+            }
+            j++;
+        }
+    
+        return merged;
+    }
+    /*Пример неудачной попытки в лоб где столкнулся с переизбытком условий, а также загнал себя в слишком узкие рамки где нужно было по сути рассматривать почти каждый случай отдельно.
+    public static List<int> FindMedianSortedArrays(int[] nums1, int[] nums2)
+    {
+        List<int> merged = new List<int>();
+        int j = 1;
+        int i = 1;
+
+        while (i < nums1.Length && j < nums2.Length)
+        {
+            if (nums1[i - 1] != nums1[i])
+            {
+                if (nums2[j - 1] != nums2[j])
+                {
+                    if (i == nums1.Length - 1)
+                    {
+                        if (nums1[i - 1] < nums2[j - 1])
+                        {
+                            merged.Add(nums1[i-1]);
+                            merged.Add(nums2[j-1]);
+                        }
+                        else if(nums1[i - 1] > nums2[j - 1])
+                        {
+                            merged.Add(nums2[j-1]);
+                            merged.Add(nums1[i-1]);
+                        } 
+                        else if(nums1[i - 1] == nums2[j - 1])
+                        {
+                            merged.Add(nums2[j-1]);
+                        }
+                        if (nums1[i] < nums2[j])
+                        {
+                            merged.Add(nums1[i]);
+                            i++;
+                        } 
+                        else if (nums1[i] > nums2[j])
+                        {
+                            merged.Add(nums2[j]);
+                            j++;
+                        } 
+                        else if (nums1[i] == nums2[j])
+                        {
+                            merged.Add(nums1[i]);
+                            i++;
+                            j++;
+                        }
+                    }
+                    else if (j == nums2.Length - 1)
+                    {
+                        if (nums1[i - 1] < nums2[j - 1])
+                        {
+                            merged.Add(nums1[i-1]);
+                            merged.Add(nums2[j-1]);
+                        }
+                        else if(nums1[i - 1] > nums2[j - 1])
+                        {
+                            merged.Add(nums2[j-1]);
+                        } 
+                        else if(nums1[i - 1] == nums2[j - 1])
+                        {
+                            merged.Add(nums2[j-1]);
+                        }
+                        if (nums2[j] < nums1[i])
+                        {
+                            merged.Add(nums2[j]);
+                            j++;
+                        } 
+                        else if (nums2[j] > nums1[i])
+                        {
+                            merged.Add(nums1[i]);
+                            i++;
+                        } 
+                        else if (nums1[i] == nums2[j])
+                        {
+                            merged.Add(nums1[i]);
+                            i++;
+                            j++;
+                        }
+                    }
+                    else
+                    {
+                        if (nums1[i - 1] < nums2[j - 1])
+                        {
+                            merged.Add(nums1[i-1]);
+                            i++;
+                        }
+                        else if(nums1[i - 1] > nums2[j - 1])
+                        {
+                            merged.Add(nums2[j-1]);
+                            j++;
+                        } 
+                        else if(nums1[i - 1] == nums2[j - 1])
+                        {
+                            merged.Add(nums2[j-1]);
+                            i++;
+                            j++;
+                        }
+                    }
+                }
+                else
+                {
+                    j++;
+                }
+            }
+            else
+            {
+                i++;
+            }
+        }
+        
+        while (i < nums1.Length) merged.Add(nums1[i++]);
+        while (j < nums2.Length) merged.Add(nums2[j++]);
+        
+        return merged;
+    }*/
+
+    public List<int> deleteRepeatNumbers(int[] nums)
+    {
+        List<int> temp = new List<int>();
+        
+        for (int i = 1; i < nums.Length; i++)
+        {
+            if (nums[i] !=  nums[i-1])
+            {
+               temp.Add(nums[i-1]);
+            }
+            if (i == nums.Length - 1)
+            {
+                temp.Add(nums[i]);
+            }
+        }
+        return temp; 
+    }
+    
+    //21
+    //задача уровня изи, но по факту я бы именно из-за логики поставил на медиум так, как идет работа со ссылками и что-то я запутался немного, зато в итоге узнал новую конструкцию типо dummy ссылка (у меня называется answer) для того чтобы запоминать начало и не делать проверку через if еще одну, в целом задача прикольная и когда узнал решение сильно не тупил
+    public ListNode MergeTwoLists(ListNode list1, ListNode list2) {
+        ListNode answer = new ListNode(1);
+        ListNode current = answer;
+        while (list1 != null && list2 != null)
+        {
+            if (list1.val <=  list2.val)
+            {
+                current.next = list1;
+                list1 =  list1.next;
+                current = current.next;
+            }
+            else
+            {
+                current.next = list2;
+                list2 =  list2.next;
+                current = current.next;
+            }
+        }
+        
+        if (list1 != null)
+        {
+            current.next = list1;
+        } else if (list2 != null)
+        {
+            current.next = list2;
+        }
+        
+        return answer.next;
+    }
+    
     //258 
     //задача уровня изи так что нечего говорить по сути просто сложить все со всем самое сложное просто правильно спарсить char в инт (нужно переводить в строку отдельный char иначе будет считать char по таблице)
     public static int Anything(int num)
@@ -218,11 +427,11 @@ public class Solution
 
         // Словарь соответствия открывающих и закрывающих скобок
         Dictionary<char, char> bracketPairs = new Dictionary<char, char>
-    {
-        { ')', '(' },
-        { ']', '[' },
-        { '}', '{' }
-    };
+        {
+            { ')', '(' },
+            { ']', '[' },
+            { '}', '{' }
+        };
 
         foreach (char c in brackets)
         {
@@ -307,18 +516,18 @@ public class Solution
 
     public static string ChangeString(string str)
     {
-       StringBuilder stringBuilder = new StringBuilder(str);
+        StringBuilder stringBuilder = new StringBuilder(str);
         int i = 0;
         while (i <= stringBuilder.Length-1)
         {
-           if (stringBuilder[i] == '#' & i == 0)
+            if (stringBuilder[i] == '#' & i == 0)
             {
                 stringBuilder.Remove(i, 1);
                 i--;
             }
             else if (stringBuilder[i] == '#')
             {
-               stringBuilder.Remove(i-1, 2);
+                stringBuilder.Remove(i-1, 2);
                 if (i >= 1)
                 {
                     i-=2;
@@ -369,7 +578,7 @@ public class Solution
                         maxday = meeting[1];
                     }
                 }
-                    minday = meeting[0];
+                minday = meeting[0];
 
             } else if(minday < meeting[0]) {
                 if(maxday < meeting[0])
@@ -548,6 +757,18 @@ public class Solution
     }
 }
 
+public class ListNode
+{
+    public int val;
+    public ListNode next;
+
+    public ListNode(int val = 0, ListNode next = null)
+    {
+        this.val = val;
+        this.next = next;
+    }
+}
+
 //225 обычная задача, но при этом все равно решил не с первого раза(можно было сделать по другому, но ладно)
 public class MyStack
 {
@@ -559,7 +780,7 @@ public class MyStack
 
     public void Push(int x)
     {
-       stack1.Enqueue(x);
+        stack1.Enqueue(x);
     }
 
     public int Pop()
@@ -823,4 +1044,3 @@ public class MyStack
 //{
 //    Console.WriteLine(square);
 //}
-
